@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 namespace Saree3.API.Controllers
 {
     [ApiController]
