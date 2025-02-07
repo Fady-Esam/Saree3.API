@@ -12,7 +12,7 @@ namespace Saree3.API.Domains
         public DateTime CreatedAt { get; set; }
         public bool IsExpired => DateTime.UtcNow >= ExpiryDate;
         public bool IsActive => RevokedAt == null && !IsExpired;
-        public string UserId { get; set; } 
-        public virtual AppUser User { get; set; }
+        //public string UserId { get; set; } 
+        //public virtual AppUser User { get; set; }
     }
 }

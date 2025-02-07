@@ -12,16 +12,16 @@ namespace Saree3.API
         {
             base.OnModelCreating(builder);
 
-            // Configure one-to-many relationship between User and RefreshToken
-            builder.Entity<UserRefreshToken>()
-                .HasOne(r => r.User)
-                .WithMany()  // User can have many refresh tokens
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Cascade);  // Cascade delete, if user is deleted, so are their refresh tokens
+            //// Configure one-to-many relationship between User and RefreshToken
+            //builder.Entity<UserRefreshToken>()
+            //    .HasOne(r => r.User)
+            //    .WithMany()  // User can have many refresh tokens
+            //    .HasForeignKey(r => r.UserId)
+            //    .OnDelete(DeleteBehavior.Cascade);  // Cascade delete, if user is deleted, so are their refresh tokens
 
 
         }
-        public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+        //public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
     }
 
 

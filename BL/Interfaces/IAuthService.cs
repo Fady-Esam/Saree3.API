@@ -7,6 +7,8 @@ namespace Saree3.API.BL.Interfaces
         Task<APIResponse> RegisterCustomerWithEmailAndPassword(RegisterModel RegisterModel);
         Task<APIResponse> RegisterRiderWithEmailAndPassword(RegisterModel RegisterModel);
         Task<APIResponse> LoginWithEmailAndPassword(LogInModel LogInModel);
+        Task<APIResponse> RefreshToken(string refToken);
+        Task<APIResponse> RevokeToken(string refToken);
 
         //Task<ApiResponse> LoginWithFacebook(string accessToken);
         //Task<ApiResponse> LoginWithApple(string idToken);

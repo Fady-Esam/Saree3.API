@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using NuGet.Common;
 using Saree3.API.BL.Interfaces;
 using Saree3.API.Domains;
 using Saree3.API.Models;
@@ -61,15 +63,18 @@ namespace Saree3.API.BL.Classes
                     };
                 }
                 var token = await GetAccessToken(user);
+                var refreshToken = GenerateRefreshToken();
                 var authModel = new AuthModel
                 {
                     UserId = user.Id,
                     IsAuthenticated = true,
                     Roles = new List<string> { "Customer" },
-                    ExpiresOn = token.ValidTo,
+                    TokenExpiresDate = token.ValidTo,
                     UserName = user.UserName,
                     Email = user.Email,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    RefreshToken = refreshToken.RefreshToken,
+                    RefreshTokenExpiryDate = refreshToken.ExpiryDate
                 };
                 return new APIResponse
                 {
@@ -88,49 +93,6 @@ namespace Saree3.API.BL.Classes
 
         }
 
-
-        public async Task<APIResponse> LoginWithEmailAndPassword(LogInModel LogInModel)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(LogInModel.Email);
-                if (user is null || !await _userManager.CheckPasswordAsync(user, LogInModel.Password))
-                {
-                    return new APIResponse
-                    {
-                        Success = false,
-                        ErrMessage = "Invalid Email or Password",
-                    };
-                }
-                var token = await GetAccessToken(user);
-
-                var authModel = new AuthModel
-                {
-                    UserId = user.Id,
-                    IsAuthenticated = true,
-                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
-                    ExpiresOn = token.ValidTo,
-                    UserName = user.UserName!,
-                    Email = user.Email!,
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-
-                };
-                return new APIResponse
-                {
-                    Success = true,
-                    Data = authModel,
-                };
-
-            }
-            catch (Exception ex)
-            {
-                return new APIResponse
-                {
-                    Success = false,
-                    ErrMessage = "Server Failure, Please try again"
-                };
-            }
-        }
         public async Task<APIResponse> RegisterRiderWithEmailAndPassword(RegisterModel RegisterModel)
         {
             try
@@ -167,16 +129,19 @@ namespace Saree3.API.BL.Classes
                     };
                 }
                 var token = await GetAccessToken(user);
+                var refreshToken = GenerateRefreshToken();
 
                 var authModel = new AuthModel
                 {
                     UserId = user.Id,
                     IsAuthenticated = true,
                     Roles = new List<string> { "Rider" },
-                    ExpiresOn = token.ValidTo,
+                    TokenExpiresDate = token.ValidTo,
                     UserName = user.UserName,
                     Email = user.Email,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    RefreshToken = refreshToken.RefreshToken,
+                    RefreshTokenExpiryDate = refreshToken.ExpiryDate
                 };
                 return new APIResponse
                 {
@@ -193,6 +158,63 @@ namespace Saree3.API.BL.Classes
                 };
             }
         }
+
+        public async Task<APIResponse> LoginWithEmailAndPassword(LogInModel LogInModel)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LogInModel.Email);
+                if (user is null || !await _userManager.CheckPasswordAsync(user, LogInModel.Password))
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        ErrMessage = "Invalid Email or Password",
+                    };
+                }
+                var token = await GetAccessToken(user);
+
+                var authModel = new AuthModel();
+                authModel.UserId = user.Id;
+                authModel.IsAuthenticated = true;
+                authModel.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+                authModel.UserName = user.UserName!;
+                authModel.TokenExpiresDate = token.ValidTo;
+                authModel.Email = user.Email!;
+                authModel.Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+                if (user.UserRefreshTokens.Any(i => i.IsActive))                   
+                {
+                    var ActiveRefToken = user.UserRefreshTokens.FirstOrDefault(i => i.IsActive);
+                    authModel.RefreshToken = ActiveRefToken.RefreshToken;
+                    authModel.RefreshTokenExpiryDate = ActiveRefToken.ExpiryDate;
+                }
+                else
+                {
+                    var RefToken = GenerateRefreshToken();
+                    authModel.RefreshToken = RefToken.RefreshToken;
+                    authModel.RefreshTokenExpiryDate = RefToken.ExpiryDate;
+                    user.UserRefreshTokens.Add(RefToken);
+                    await _userManager.UpdateAsync(user);
+                }
+
+                return new APIResponse
+                {
+                    Success = true,
+                    Data = authModel,
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    ErrMessage = "Server Failure, Please try again"
+                };
+            }
+        }
+
         private async Task<JwtSecurityToken> GetAccessToken(AppUser appUser)
         {
             var claims = new List<Claim>
@@ -213,20 +235,123 @@ namespace Saree3.API.BL.Classes
                     issuer: _jwt.Issuer,
                     audience: _jwt.Audience,
                     claims: claims,
-                    expires: DateTime.Now.AddMonths(_jwt.DurationInMonths),
+                    expires: DateTime.Now.AddHours(_jwt.DurationInHours),
                     signingCredentials: credentials
                 );
             return jwtToken;
 
         }
+        private UserRefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = Guid.NewGuid().ToString();
+            return new UserRefreshToken 
+            { 
+                CreatedAt = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddDays(7),
+                RefreshToken = refreshToken,
+            };
+        }
 
+        public async Task<APIResponse> RefreshToken(string refTokenString)
+        {
+            try
+            {
+                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserRefreshTokens.Any(t => t.RefreshToken == refTokenString));
+                if (user == null)
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        ErrMessage = "Invalid Token"
+                    };
+                }
+                var RefreshToken = user.UserRefreshTokens.Single(t => t.RefreshToken == refTokenString);
+                if (!RefreshToken.IsActive)
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        ErrMessage = "InActive Token"
+                    };
+                }
+                RefreshToken.RevokedAt = DateTime.UtcNow;
+
+                var newRefreshToken = GenerateRefreshToken();
+                user.UserRefreshTokens.Add(newRefreshToken);
+                await _userManager.UpdateAsync(user);
+
+                var token = await GetAccessToken(user);
+
+
+                var authModel = new AuthModel
+                {
+                    UserId = user.Id,
+                    IsAuthenticated = true,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    UserName = user!.UserName!,
+                    Email = user!.Email!,
+                    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    RefreshToken = newRefreshToken.RefreshToken,
+                    RefreshTokenExpiryDate = newRefreshToken.ExpiryDate,
+                };
+                return new APIResponse
+                {
+                    Success = true,
+                    Data = authModel
+                };
+
+            }
+            catch(Exception ex)
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    ErrMessage = "Server Error, Please try again"
+                };
+            }
+
+        }
+
+        public async Task<APIResponse> RevokeToken(string refTokenString)
+        {
+            try
+            {
+                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserRefreshTokens.Any(t => t.RefreshToken == refTokenString));
+                if (user == null)
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                    };
+                }
+                var RefreshToken = user.UserRefreshTokens.Single(t => t.RefreshToken == refTokenString);
+                if (!RefreshToken.IsActive)
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                    };
+                }
+                RefreshToken.RevokedAt = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+
+                return new APIResponse
+                {
+                    Success = true,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    ErrMessage = "Server Error, Please try again"
+                };
+            }
+
+        }
 
         #region RefreshTokenSection
-        //private string GenerateRefreshToken()
-        //{
-        //    var refreshToken = Guid.NewGuid().ToString();
-        //    return refreshToken;
-        //}
         //public async Task StoreRefreshToken(string userId, string refreshToken)
         //{
         //    try

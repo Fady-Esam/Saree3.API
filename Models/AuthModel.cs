@@ -1,4 +1,6 @@
-﻿namespace Saree3.API.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Saree3.API.Models
 {
     public class AuthModel
     {
@@ -8,7 +10,9 @@
         public List<string> Roles { get; set; }
         public bool IsAuthenticated { get; set; }
         public string Token { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime ExpiresOn { get; set; }
+        public DateTime TokenExpiresDate { get; set; }
+        [JsonIgnore]
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryDate { get; set; }
     }
 }

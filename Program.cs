@@ -4,11 +4,14 @@ using Saree3.API.Domains;
 using Saree3.API;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Saree3.API.Models;
+using Saree3.API.BL.Classes;
+using Saree3.API.BL.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Services.Configure<JWT>(
-//    builder.Configuration.GetSection("JWT")
-//);
+builder.Services.Configure<JWTModel>(
+    builder.Configuration.GetSection("JWT")
+);
 
 builder.Services.AddHttpClient();
 
@@ -29,7 +32,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders();
-//builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddScoped<IHomeService, HomeService>();
 
 // Add other services like controllers, session, etc.
@@ -46,28 +49,28 @@ builder.Services.AddDistributedSqlServerCache(options =>
 builder.Services.AddDistributedMemoryCache();
 */
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(options =>
-//{
-//    var jwtSettings = builder.Configuration.GetSection("JWT").Get<JWT>();
-//    //options.SaveToken = false;
-//    //options.RequireHttpsMetadata = false;
-//    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.Key)),
-//        ClockSkew = TimeSpan.Zero, // Optional: Set to zero to avoid clock skew issues
-//        ValidIssuer = jwtSettings.Issuer,
-//        ValidAudience = jwtSettings.Audience
-//    };
-//})
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JWT").Get<JWTModel>();
+    options.SaveToken = false;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings!.Key)),
+        ClockSkew = TimeSpan.Zero, // Optional: Set to zero to avoid clock skew issues
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience
+    };
+});
 //.AddGoogle(options =>
 //{
 //    options.ClientId = "rOkBTRTHAg0jDAXH2M927hFrOZwiiuweotiu221346546aqBosq8Cr-7DHBzJHk";
