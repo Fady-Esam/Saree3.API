@@ -34,30 +34,6 @@ A RESTful API built with **ASP.NET Core** for managing delivery app data.
 </p>
 
 ---
-## 📦 Packages Used (Implemented So Far)
-
-- 📄 `Swashbuckle.AspNetCore`  
-- 🏢 `Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation`  
-- 🗃️ `Microsoft.EntityFrameworkCore`  
-- 🗃️🔌 `Microsoft.EntityFrameworkCore.SqlServer`  
-- 🛠️ `Microsoft.EntityFrameworkCore.Tools`  
-- 🔐 `Microsoft.AspNetCore.Identity.EntityFrameworkCore`  
-- 📝 `Microsoft.Extensions.Logging`  
-- 📜 `Serilog.Extensions.Logging`  
-- ⚙️ `Microsoft.Extensions.Configuration.Binder`  
-- 🔑 `Microsoft.AspNetCore.Authentication.JwtBearer`  
-- 🎨 `Microsoft.VisualStudio.Web.CodeGeneration.Design`  
-- 👥 `Microsoft.AspNetCore.Identity.UI`  
-- 🩺 `Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore`  
-- 👻 `Microsoft.EntityFrameworkCore.Proxies`  
-- 🧠 `Microsoft.Extensions.Caching.StackExchangeRedis`  
-- 🗄️ `Microsoft.Extensions.Caching.SqlServer`  
-- 🔵 `Microsoft.AspNetCore.Authentication.Google`  
-- 📘 `Microsoft.AspNetCore.Authentication.Facebook`  
-- 🔗 `Microsoft.AspNetCore.Authentication.OpenIdConnect`  
-- 🛡️ `System.Security.Permissions`  
-
----
 
 ## 📫 Connect With Me
 <h5 align="left"> 
