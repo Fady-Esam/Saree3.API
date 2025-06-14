@@ -1,4 +1,4 @@
-# 🛵📦 Delivery App API
+# 🛵📦 Delivery API
 
 A RESTful API built with **ASP.NET Core** for managing delivery app data.  
 *Currently under active development and debugging.*
