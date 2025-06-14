@@ -24,21 +24,19 @@ A RESTful API built with **ASP.NET Core** for managing delivery app data.
 
 ## 🛠️ Languages & Tools
 <p align="left"> 
-        <img src="https://github.com/user-attachments/assets/371823a5-1412-4df5-bc39-8dbe2301d3b5" alt="C#" width="50" height="45"/>
-        <img src="https://www.vectorlogo.zone/logos/dotnet/dotnet-official.svg" alt=".NET" width="50" height="45"/>
-        <img src="https://github.com/user-attachments/assets/7c52a0af-9e04-4cb9-8a08-e492f9ea1ff1" alt="SQL Database" width="50" height="45"/>
-        <img src="https://github.com/user-attachments/assets/92a8f8f5-b9cc-4ca4-88d8-b8ae33106ddb" alt="SQL Server" width="50" height="45"/> 
-        <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" alt="Postman" width="50" height="45"/>
-        <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="Git" width="50" height="45"/>
-        <img src="https://github.com/user-attachments/assets/77a7ebaf-391a-4c1f-b705-12323cbaaa98" alt="Visual Studio" width="50" height="45"/>
+        <img src="https://skillicons.dev/icons?i=cs,postman,visualstudio,git,github" alt="Tech stack icons" />
+ 	<img src="https://github.com/user-attachments/assets/bed1f933-9788-4ac4-b233-a9986092db48" alt="Swagger" width="48" height="48"/>        
+        <img src="https://www.vectorlogo.zone/logos/dotnet/dotnet-official.svg" alt=".NET" width="48" height="48"/>
+        <img src="https://github.com/user-attachments/assets/fa32ecd8-f181-4041-8783-c52c2a1a2394" alt="ASP .NET Core" width="48" height="48"/>
+        <img src="https://github.com/user-attachments/assets/7c52a0af-9e04-4cb9-8a08-e492f9ea1ff1" alt="SQL Database" width="48" height="48"/>
+        <img src="https://github.com/user-attachments/assets/92a8f8f5-b9cc-4ca4-88d8-b8ae33106ddb" alt="SQL Server" width="48" height="48"/> 
 </p>
 
 ---
 
-## 🔗 Related Frontend
+## 🔗 Related Projects
 
 - 📱 [Flutter Mobile App](https://github.com/Fady-Esam/flutter-delivery-app) — The mobile app client for this API.
-
 
 ---
 
